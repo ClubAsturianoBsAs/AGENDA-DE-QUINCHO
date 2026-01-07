@@ -209,10 +209,10 @@ function validarSocio() {
 
     // --- NUEVA LÓGICA DE LIMPIEZA SELECTIVA ---
     const partes = fechaRaw.split('/');
-    if (partes.length === 3) {
-      const dia = parseInt(partes[0], 10); // Quita el cero: "01" -> 1
-      const mes = partes[1];               // Mantiene el mes como está: "02"
-      const anio = partes[2];              // Mantiene el año
+if (partes.length === 3) {
+  const dia = partes[0];  // Simplemente asigna el valor, sin parseInt
+  const mes = partes[1];  // Mantiene "02"
+  const anio = partes[2]; // Mantiene el año
       
       const fechaLimpia = `${dia}/${mes}/${anio}`; // Resultado: "1/02/1234"
 
