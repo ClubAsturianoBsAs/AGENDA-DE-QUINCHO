@@ -375,7 +375,7 @@ function abrirConfirmacion() {
       .then(r => r.json())
       .then(res => {
         if (res.exito) {
-          alert("✅ ¡Agenda guardada con éxito!: para el disfrute del beneficio de agenda el socio debe estar al dia con su cuota.");
+          alert("✅ ¡Agenda guardada con éxito!: para el disfrute del beneficio de agenda el socio debe estar al dia con su cuota. RECUERDE ENVIAR LA LISTA DE INVITADOS NO SOCIOS UN DIA ANTES DEL EVENTO PARA SU RESPECTIVO CONTROL Y ACCESO");
           window.open(`https://wa.me/5491151585858?text=Hola! Envío comprobante de reserva Quincho de ${socioNombre}`, '_blank');
           location.reload();
         } else {
