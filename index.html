@@ -122,7 +122,7 @@
         </div>
       </div>
 
-      <h3 style="font-size: 1rem; color: var(--azul-primario); margin-top: 10px;">👥 Invitados NO SOCIOS (Valores unitarios):</h3>
+      <h3 style="font-size: 1rem; color: var(--azul-primario); margin-top: 10px;">👥 Invitados (Valores unitarios):</h3>
       <div class="grid-invitados">
         <div class="form-group"><label>Mayores (18 a 65 años) ($7.700)</label><input type="number" id="may" value="0" min="0" oninput="calcularTotal()"></div>
         <div class="form-group"><label>Juveniles (13 a 17 años) ($5.500)</label><input type="number" id="juv" value="0" min="0" oninput="calcularTotal()"></div>
@@ -212,7 +212,7 @@ function validarSocio() {
 if (partes.length === 3) {
   const dia = partes[0];  // Simplemente asigna el valor, sin parseInt
   const mes = partes[1];  // Mantiene "02"
-  const anio = partes[2]; // Mantiene el año
+  const anio = partes[2]; // Mantiene el año              // Mantiene el año
       
       const fechaLimpia = `${dia}/${mes}/${anio}`; // Resultado: "1/02/1234"
 
@@ -375,7 +375,7 @@ function abrirConfirmacion() {
       .then(r => r.json())
       .then(res => {
         if (res.exito) {
-          alert("✅ ¡Agenda guardada con éxito!: para el disfrute del beneficio de agenda el socio debe estar al dia con su cuota. RECUERDE ENVIAR LA LISTA DE INVITADOS NO SOCIOS UN DIA ANTES DEL EVENTO PARA SU RESPECTIVO CONTROL Y ACCESO");
+          alert("✅ ¡Agenda guardada con éxito!: para el disfrute del beneficio de agenda el socio debe estar al dia con su cuota.");
           window.open(`https://wa.me/5491151585858?text=Hola! Envío comprobante de reserva Quincho de ${socioNombre}`, '_blank');
           location.reload();
         } else {
