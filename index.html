@@ -101,10 +101,14 @@
       </div>
 
       <div class="grid-2">
-<div class="form-group">
-  <label>📅 Fecha del Evento <span style="font-size: 0.75rem; color: var(--rojo); font-weight: normal;">(Máximo 10 días de antelación)</span></label>
-  <input type="text" id="fechaEvento" placeholder="DD/MM/AAAA" oninput="mascaraFecha(this); calcularTotal();">
-</div>
+        <div class="form-group">
+          <label>📅 Fecha del Evento <span style="font-size: 0.75rem; color: var(--rojo); font-weight: normal;">(Máx 10 días ant.)</span></label>
+          <input type="text" id="fechaEvento" placeholder="DD/MM/AAAA" oninput="mascaraFecha(this); calcularTotal();">
+          
+          <label style="font-size:0.75rem; color:var(--amarillo); margin-top:5px; display:flex; align-items:center; cursor:pointer;">
+             <input type="checkbox" id="esFeriado" onchange="calcularTotal()" style="width:auto; margin-right:5px;"> ¿Es Feriado?
+          </label>
+        </div>
         <div class="form-group">
           <label>👥 Total Invitados</label>
           <input type="number" id="totalInvitados" readonly style="background:#e2e8f0">
@@ -122,13 +126,13 @@
         </div>
       </div>
 
-      <h3 style="font-size: 1rem; color: var(--azul-primario); margin-top: 10px;">👥 Invitados (Valores unitarios):</h3>
+      <h3 style="font-size: 1rem; color: var(--azul-primario); margin-top: 10px;">👥 Invitados (Precios Dinámicos):</h3>
       <div class="grid-invitados">
-        <div class="form-group"><label>Mayores (18 a 65 años) ($7.700)</label><input type="number" id="may" value="0" min="0" oninput="calcularTotal()"></div>
-        <div class="form-group"><label>Juveniles (13 a 17 años) ($5.500)</label><input type="number" id="juv" value="0" min="0" oninput="calcularTotal()"></div>
-        <div class="form-group"><label>Jubilados (+65 años) ($4.900)</label><input type="number" id="jub" value="0" min="0" oninput="calcularTotal()"></div>
-        <div class="form-group"><label>Menores (5 a 12 años) ($4.000)</label><input type="number" id="men" value="0" min="0" oninput="calcularTotal()"></div>
-        <div class="form-group"><label>Infantiles (0 a 4 años) (Sin cargo)</label><input type="number" id="inf" value="0" min="0" oninput="calcularTotal()"></div>
+        <div class="form-group"><label id="lbl_may">Mayores (18 a 65)</label><input type="number" id="may" value="0" min="0" oninput="calcularTotal()"></div>
+        <div class="form-group"><label id="lbl_juv">Juveniles (13 a 17)</label><input type="number" id="juv" value="0" min="0" oninput="calcularTotal()"></div>
+        <div class="form-group"><label id="lbl_jub">Jubilados (+65)</label><input type="number" id="jub" value="0" min="0" oninput="calcularTotal()"></div>
+        <div class="form-group"><label id="lbl_men">Menores (5 a 12)</label><input type="number" id="men" value="0" min="0" oninput="calcularTotal()"></div>
+        <div class="form-group"><label id="lbl_inf">Infantiles (0 a 4) (Sin Cargo)</label><input type="number" id="inf" value="0" min="0" oninput="calcularTotal()"></div>
       </div>
 
       <div style="background:#f8fafc; padding:15px; border-radius:12px; margin-top:10px; border: 1px solid #e2e8f0;">
@@ -173,7 +177,15 @@
 <script>
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGK7GZdtyrFFVq6_J0XRfk9C8CQzE5q4IWymierY71vZ8LrjcPsuVlFW2QGjqpSdTVuQ/exec';
 
-  const TARIFAS = { may: 7700, juv: 5500, jub: 4900, men: 4000, inf: 0, inflable: 20000, seguridad: 20000 };
+  // --- CONFIGURACIÓN DE TARIFAS DINÁMICAS ---
+  // MARTES A JUEVES
+  const PRECIOS_SEMANA = { may: 6200, juv: 5000, jub: 3900, men: 3500, inf: 0, inflable: 20000, seguridad: 20000 };
+  // VIERNES, SABADO, DOMINGO Y FERIADOS
+  const PRECIOS_FINDE  = { may: 7700, juv: 5500, jub: 4900, men: 4000, inf: 0, inflable: 20000, seguridad: 20000 };
+  
+  // Variable global para guardar las tarifas actuales
+  let TARIFAS_ACTUALES = PRECIOS_FINDE; 
+
   let socioNombre = "";
   let descuentoAplicado = 0;
   let seguridadActiva = false;
@@ -197,9 +209,9 @@
     });
   }
 
-function validarSocio() {
+  function validarSocio() {
     const socio = document.getElementById('numSocio').value;
-    const fechaRaw = document.getElementById('fechaNac').value; // Ejemplo: "01/02/1234"
+    const fechaRaw = document.getElementById('fechaNac').value;
     const btn = document.getElementById('btnValidar');
 
     if (!socio || !fechaRaw) {
@@ -207,19 +219,17 @@ function validarSocio() {
       return;
     }
 
-    // --- NUEVA LÓGICA DE LIMPIEZA SELECTIVA ---
     const partes = fechaRaw.split('/');
-if (partes.length === 3) {
-  const dia = partes[0];  // Simplemente asigna el valor, sin parseInt
-  const mes = partes[1];  // Mantiene "02"
-  const anio = partes[2]; // Mantiene el año              // Mantiene el año
+    if (partes.length === 3) {
+      const dia = partes[0]; 
+      const mes = partes[1]; 
+      const anio = partes[2]; 
       
-      const fechaLimpia = `${dia}/${mes}/${anio}`; // Resultado: "1/02/1234"
+      const fechaLimpia = `${dia}/${mes}/${anio}`;
 
       btn.innerText = "⏳ Verificando...";
       btn.disabled = true;
 
-      // Enviamos la fecha procesada
       fetch(`${APPS_SCRIPT_URL}?action=validarSocio&numSocio=${socio}&fechaNac=${fechaLimpia}`)
         .then(r => r.json())
         .then(res => {
@@ -228,6 +238,8 @@ if (partes.length === 3) {
             document.getElementById('nombreSocioDisplay').innerText = "Socio/a: " + socioNombre;
             document.getElementById('modalValidacion').classList.remove('activa');
             document.getElementById('app').style.display = 'block';
+            // Iniciar con precios de fin de semana por defecto
+            actualizarLabelsPrecios(PRECIOS_FINDE);
           } else {
             alert("❌ " + res.mensaje);
           }
@@ -242,7 +254,39 @@ if (partes.length === 3) {
     }
   }
 
+  // --- LÓGICA DE PRECIOS POR DÍA ---
+  function actualizarLabelsPrecios(tarifas) {
+    document.getElementById('lbl_may').innerText = `Mayores (18 a 65) ($${tarifas.may.toLocaleString('es-AR')})`;
+    document.getElementById('lbl_juv').innerText = `Juveniles (13 a 17) ($${tarifas.juv.toLocaleString('es-AR')})`;
+    document.getElementById('lbl_jub').innerText = `Jubilados (+65) ($${tarifas.jub.toLocaleString('es-AR')})`;
+    document.getElementById('lbl_men').innerText = `Menores (5 a 12) ($${tarifas.men.toLocaleString('es-AR')})`;
+  }
+
   function calcularTotal() {
+    const fechaInput = document.getElementById('fechaEvento').value;
+    const esFeriadoCheck = document.getElementById('esFeriado').checked;
+
+    // Detectar día de la semana
+    TARIFAS_ACTUALES = PRECIOS_SEMANA; // Por defecto Martes-Jueves
+    
+    if (fechaInput && fechaInput.length === 10) {
+      const [dia, mes, anio] = fechaInput.split('/').map(Number);
+      const fechaObj = new Date(anio, mes - 1, dia);
+      const diaSemana = fechaObj.getDay(); // 0=Domingo, 1=Lunes, ... 5=Viernes, 6=Sabado
+      
+      // Si es Viernes(5), Sábado(6) o Domingo(0) O si marcaron "Es Feriado"
+      if (diaSemana === 0 || diaSemana === 5 || diaSemana === 6 || esFeriadoCheck) {
+        TARIFAS_ACTUALES = PRECIOS_FINDE;
+      }
+    } else {
+        // Si no hay fecha, mostramos precio FINDE por seguridad/default
+        TARIFAS_ACTUALES = PRECIOS_FINDE;
+    }
+
+    // Actualizar visualmente los textos
+    actualizarLabelsPrecios(TARIFAS_ACTUALES);
+
+    // --- CÁLCULOS ---
     const hFin = document.getElementById('horaFin').value;
     let counts = {
       may: parseInt(document.getElementById('may').value) || 0,
@@ -255,7 +299,11 @@ if (partes.length === 3) {
     const totalInv = Object.values(counts).reduce((a, b) => a + b, 0);
     document.getElementById('totalInvitados').value = totalInv;
 
-    let subtotalInvitados = (counts.may * TARIFAS.may) + (counts.juv * TARIFAS.juv) + (counts.jub * TARIFAS.jub) + (counts.men * TARIFAS.men);
+    let subtotalInvitados = 
+        (counts.may * TARIFAS_ACTUALES.may) + 
+        (counts.juv * TARIFAS_ACTUALES.juv) + 
+        (counts.jub * TARIFAS_ACTUALES.jub) + 
+        (counts.men * TARIFAS_ACTUALES.men);
     
     descuentoAplicado = 0;
     if (document.getElementById('cumple').checked) {
@@ -264,7 +312,7 @@ if (partes.length === 3) {
       orden.forEach(tipo => {
         if (cupo > 0 && counts[tipo] > 0) {
           let descontar = Math.min(counts[tipo], cupo);
-          descuentoAplicado += (descontar * TARIFAS[tipo]);
+          descuentoAplicado += (descontar * TARIFAS_ACTUALES[tipo]);
           cupo -= descontar;
         }
       });
@@ -277,7 +325,7 @@ if (partes.length === 3) {
       let [hh, mm] = hFin.split(':').map(Number);
       let minTotales = (hh * 60) + mm;
       if (minTotales >= 10 && minTotales <= 300) {
-        total += TARIFAS.seguridad;
+        total += TARIFAS_ACTUALES.seguridad;
         seguridadActiva = true;
         if (!window.seguridadAlerta) {
           alert("👮 SEGURIDAD:\nPara reuniones pasadas las 00:00hs se tiene que abonar la seguridad correspondiente a 5 horas ($20.000).");
@@ -286,7 +334,7 @@ if (partes.length === 3) {
       } else { window.seguridadAlerta = false; }
     }
 
-    if (document.getElementById('inflable').checked) total += TARIFAS.inflable;
+    if (document.getElementById('inflable').checked) total += TARIFAS_ACTUALES.inflable;
 
     document.getElementById('montoVisual').innerText = total.toLocaleString('es-AR');
     document.getElementById('btnConfirmar').disabled = (totalInv === 0);
@@ -300,7 +348,7 @@ if (partes.length === 3) {
     if(cb.checked) alert("🎉 AVISO CUMPLEAÑERO:\n\nbeneficio unico para el socio cumpleañero para ser uso por unica vez desde la fecha de nacimiento hasta 30 dias corridos.");
   }
 
-function abrirConfirmacion() {
+  function abrirConfirmacion() {
     const fechaInput = document.getElementById('fechaEvento').value;
     
     // 1. Validar que la fecha esté completa
@@ -309,15 +357,11 @@ function abrirConfirmacion() {
       return;
     }
 
-    // 2. Convertir fecha del input a objeto Date
     const [dia, mes, anio] = fechaInput.split('/').map(Number);
     const fechaElegida = new Date(anio, mes - 1, dia);
-    
-    // 3. Obtener fecha de hoy (sin horas para comparar solo días)
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
-    // 4. Calcular diferencia
     const milisegundosPorDia = 24 * 60 * 60 * 1000;
     const diffDias = Math.floor((fechaElegida - hoy) / milisegundosPorDia);
 
@@ -332,9 +376,8 @@ function abrirConfirmacion() {
       return;
     }
 
-    // Si pasa las validaciones, sigue con el desglose habitual
-    const segVal = seguridadActiva ? TARIFAS.seguridad : 0;
-    const infVal = document.getElementById('inflable').checked ? TARIFAS.inflable : 0;
+    const segVal = seguridadActiva ? TARIFAS_ACTUALES.seguridad : 0;
+    const infVal = document.getElementById('inflable').checked ? TARIFAS_ACTUALES.inflable : 0;
 
     let html = `
       <div class="item-detalle"><span>Socio:</span> <span>${socioNombre}</span></div>
