@@ -185,7 +185,7 @@
   </div>
 
 <script>
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGK7GZdtyrFFVq6_J0XRfk9C8CQzE5q4IWymierY71vZ8LrjcPsuVlFW2QGjqpSdTVuQ/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyJ9Y1JlOXdNYshIqVZzLA3Y8K3bTaoRi6offQyBcu213La74IOvPYvzH3BavwiKWzTlw/exec';
 
   // --- PRECIOS ---
   // Martes, Miercoles, Jueves
@@ -365,10 +365,19 @@ function mascaraFecha(i) {
     if(cb.checked) alert("🎉 AVISO CUMPLEAÑERO:\n\nbeneficio unico para el socio cumpleañero para ser uso por unica vez desde la fecha de nacimiento hasta 30 dias corridos.");
   }
 
+  <script>
+  // ... resto de tus variables ...
+
   function abrirConfirmacion() {
-    // Validaciones de fecha antes de mostrar modal
+    // 1. Validaciones básicas locales (las que ya tenías)
     const fechaInput = document.getElementById('fechaEvento').value;
+    const hIni = document.getElementById('horaInicio').value;
+    const hFin = document.getElementById('horaFin').value;
+    const lugar = document.getElementById('tipoQuincho').value;
+
     if (!fechaInput || fechaInput.length < 10) { alert("⚠️ Fecha incompleta"); return; }
+    if (!hIni || !hFin) { alert("⚠️ Faltan los horarios"); return; }
+    if (!lugar) { alert("⚠️ Seleccione el lugar"); return; }
 
     const [dia, mes, anio] = fechaInput.split('/').map(Number);
     const fechaElegida = new Date(anio, mes - 1, dia);
@@ -378,12 +387,45 @@ function mascaraFecha(i) {
     if (diffDias < 0) { alert("🚫 Fecha pasada."); return; }
     if (diffDias > 10) { alert("🚫 Máximo 10 días de anticipación."); return; }
 
+    // 2. BLOQUEO UI Y LLAMADA AL SERVIDOR PARA VERIFICAR DISPONIBILIDAD
+    const btn = document.getElementById('btnConfirmar');
+    const textoOriginal = btn.innerText;
+    btn.innerText = "🔍 Verificando disponibilidad...";
+    btn.disabled = true;
+
+    const urlCheck = `${APPS_SCRIPT_URL}?action=verificarDisponibilidad&fecha=${encodeURIComponent(fechaInput)}&lugar=${encodeURIComponent(lugar)}&inicio=${encodeURIComponent(hIni)}&fin=${encodeURIComponent(hFin)}`;
+
+    fetch(urlCheck)
+      .then(r => r.json())
+      .then(res => {
+        if (res.disponible) {
+          // SI ESTÁ DISPONIBLE, EJECUTAMOS LA LÓGICA DE MOSTRAR EL MODAL
+          mostrarResumenFinal(); 
+        } else {
+          // SI ESTÁ OCUPADO, MOSTRAMOS ALERTA Y BLOQUEAMOS
+          alert("⛔ LO SENTIMOS:\n\n" + res.mensaje + "\n\nPor favor intenta otro horario o fecha.");
+        }
+      })
+      .catch(e => {
+        console.error(e);
+        alert("⚠️ Error de conexión al verificar disponibilidad.");
+      })
+      .finally(() => {
+        btn.innerText = textoOriginal;
+        btn.disabled = false;
+      });
+  }
+
+  // He separado la lógica visual en esta nueva función para mantener el orden
+  function mostrarResumenFinal() {
     const segVal = seguridadActiva ? TARIFAS_ACTUALES.seguridad : 0;
     const infVal = document.getElementById('inflable').checked ? TARIFAS_ACTUALES.inflable : 0;
+    const fechaInput = document.getElementById('fechaEvento').value;
 
     let html = `
       <div class="item-detalle"><span>Socio:</span> <span>${socioNombre}</span></div>
       <div class="item-detalle"><span>📅 Fecha:</span> <span>${fechaInput}</span></div>
+      <div class="item-detalle"><span>📍 Lugar:</span> <span style="text-transform:capitalize">${document.getElementById('tipoQuincho').value}</span></div>
       <div class="item-detalle"><span>🕒 Horario:</span> <span>${document.getElementById('horaInicio').value} a ${document.getElementById('horaFin').value}</span></div>
       <div class="item-detalle"><span>👥 Invitados:</span> <span>${document.getElementById('totalInvitados').value}</span></div>
       <div class="item-detalle"><span>🎈 Inflable:</span> <span>$${infVal.toLocaleString('es-AR')}</span></div>
