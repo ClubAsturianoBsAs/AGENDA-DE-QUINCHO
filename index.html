@@ -222,7 +222,7 @@
     </footer>
 
 <script>
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyJ9Y1JlOXdNYshIqVZzLA3Y8K3bTaoRi6offQyBcu213La74IOvPYvzH3BavwiKWzTlw/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx73BW4KVJxgOmx11Ao9WgC3hViVYtoYqmRnHjq_64p72oOdSpEhnUkfCijPX5g15PuVw/exec';
 
   // --- PRECIOS ---
   // Martes, Miercoles, Jueves
@@ -405,53 +405,54 @@ function mascaraFecha(i) {
 
   // ... resto de tus variables ...
 
-  function abrirConfirmacion() {
-    // 1. Validaciones básicas locales (las que ya tenías)
-    const fechaInput = document.getElementById('fechaEvento').value;
-    const hIni = document.getElementById('horaInicio').value;
-    const hFin = document.getElementById('horaFin').value;
-    const lugar = document.getElementById('tipoQuincho').value;
+function abrirConfirmacion() {
+  const fechaInput = document.getElementById('fechaEvento').value;
+  const hIni = document.getElementById('horaInicio').value;
+  const hFin = document.getElementById('horaFin').value;
+  const lugar = document.getElementById('tipoQuincho').value;
+  
+  // 1. OBTENER EL TOTAL DE INVITADOS (Importante para la suma en el servidor)
+  const totalInv = parseInt(document.getElementById('totalInvitados').value) || 0;
 
-    if (!fechaInput || fechaInput.length < 10) { alert("⚠️ Fecha incompleta"); return; }
-    if (!hIni || !hFin) { alert("⚠️ Faltan los horarios"); return; }
-    if (!lugar) { alert("⚠️ Seleccione el lugar"); return; }
+  if (!fechaInput || fechaInput.length < 10) { alert("⚠️ Fecha incompleta"); return; }
+  if (!hIni || !hFin) { alert("⚠️ Faltan los horarios"); return; }
+  if (!lugar) { alert("⚠️ Seleccione el lugar"); return; }
 
-    const [dia, mes, anio] = fechaInput.split('/').map(Number);
-    const fechaElegida = new Date(anio, mes - 1, dia);
-    const hoy = new Date(); hoy.setHours(0,0,0,0);
-    const diffDias = Math.floor((fechaElegida - hoy) / (1000 * 60 * 60 * 24));
+  const [dia, mes, anio] = fechaInput.split('/').map(Number);
+  const fechaElegida = new Date(anio, mes - 1, dia);
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  const diffDias = Math.floor((fechaElegida - hoy) / (1000 * 60 * 60 * 24));
 
-    if (diffDias < 0) { alert("🚫 Fecha pasada."); return; }
-    if (diffDias > 10) { alert("🚫 Máximo 10 días de anticipación."); return; }
+  if (diffDias < 0) { alert("🚫 Fecha pasada."); return; }
+  if (diffDias > 10) { alert("🚫 Máximo 10 días de anticipación."); return; }
 
-    // 2. BLOQUEO UI Y LLAMADA AL SERVIDOR PARA VERIFICAR DISPONIBILIDAD
-    const btn = document.getElementById('btnConfirmar');
-    const textoOriginal = btn.innerText;
-    btn.innerText = "🔍 Verificando disponibilidad...";
-    btn.disabled = true;
+  const btn = document.getElementById('btnConfirmar');
+  const textoOriginal = btn.innerText;
+  btn.innerText = "🔍 Verificando disponibilidad...";
+  btn.disabled = true;
 
-    const urlCheck = `${APPS_SCRIPT_URL}?action=verificarDisponibilidad&fecha=${encodeURIComponent(fechaInput)}&lugar=${encodeURIComponent(lugar)}&inicio=${encodeURIComponent(hIni)}&fin=${encodeURIComponent(hFin)}`;
+  // 2. CAMBIO AQUÍ: Agregamos &invitados=${totalInv} al final de la URL
+  const urlCheck = `${APPS_SCRIPT_URL}?action=verificarDisponibilidad&fecha=${encodeURIComponent(fechaInput)}&lugar=${encodeURIComponent(lugar)}&inicio=${encodeURIComponent(hIni)}&fin=${encodeURIComponent(hFin)}&invitados=${totalInv}`;
 
-    fetch(urlCheck)
-      .then(r => r.json())
-      .then(res => {
-        if (res.disponible) {
-          // SI ESTÁ DISPONIBLE, EJECUTAMOS LA LÓGICA DE MOSTRAR EL MODAL
-          mostrarResumenFinal(); 
-        } else {
-          // SI ESTÁ OCUPADO, MOSTRAMOS ALERTA Y BLOQUEAMOS
-          alert("⛔ LO SENTIMOS:\n\n" + res.mensaje + "\n\nPor favor intenta otro horario o fecha.");
-        }
-      })
-      .catch(e => {
-        console.error(e);
-        alert("⚠️ Error de conexión al verificar disponibilidad.");
-      })
-      .finally(() => {
-        btn.innerText = textoOriginal;
-        btn.disabled = false;
-      });
-  }
+  fetch(urlCheck)
+    .then(r => r.json())
+    .then(res => {
+      if (res.disponible) {
+        mostrarResumenFinal(); 
+      } else {
+        // Ahora el mensaje vendrá del servidor detallando cuántos cupos quedan
+        alert("⛔ ATENCIÓN:\n\n" + res.mensaje);
+      }
+    })
+    .catch(e => {
+      console.error(e);
+      alert("⚠️ Error de conexión al verificar disponibilidad.");
+    })
+    .finally(() => {
+      btn.innerText = textoOriginal;
+      btn.disabled = false;
+    });
+}
 
   // He separado la lógica visual en esta nueva función para mantener el orden
   function mostrarResumenFinal() {
