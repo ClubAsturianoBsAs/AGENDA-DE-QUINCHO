@@ -44,7 +44,7 @@
     
     .btn-copy { 
       background: #e2e8f0; color: var(--azul-primario); padding: 4px 8px; 
-      font-size: 0.7rem; border-radius: 5px; width: auto; display: inline-block; margin: 0 0 0 5px;
+      font-size: 0.7rem; border-radius: 5px; width: auto; display: inline-block; margin-left: 5px;
     }
 
     .modal { 
@@ -54,13 +54,12 @@
     .modal.activa { display: flex; }
     .modal-content { background: white; padding: 25px; border-radius: 20px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
 
-    .item-detalle { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f1f5f9; }
+    .item-detalle { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
     .total-box { background: #eff6ff; border: 2px dashed var(--azul-primario); padding: 15px; border-radius: 15px; text-align: center; margin: 15px 0; }
-    .bonus { color: var(--verde); font-weight: bold; font-size: 0.9rem; }
+    .bonus { color: var(--verde); font-weight: bold; }
     
     #nombreSocioDisplay { color: var(--azul-primario); text-align: center; margin: 15px 0; font-size: 1.2rem; border-bottom: 2px solid #eee; padding-bottom: 10px; }
     
-    /* Etiqueta nueva para mostrar la tarifa activa */
     #badgeTarifa {
       font-size: 0.75rem; font-weight: bold; padding: 4px 8px; border-radius: 5px;
       display: inline-block; margin-top: 5px; text-transform: uppercase;
@@ -68,32 +67,19 @@
     .tarifa-semana { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
     .tarifa-finde { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
 
-    /* Estilos para el Footer "Powered by" */
-.footer-cs {
-  margin-top: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  font-size: 0.85rem;
-  color: #94a3b8; /* Un gris suave que combina */
-}
-
-.badge-cs {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 20px;
-  width: 20px;
-  border-radius: 50%;
-  background-color: #6366f1; /* Indigo */
-  color: white;
-  font-weight: bold;
-  font-size: 10px;
-  line-height: 1;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
+    /* Footer y Admin */
+    .footer-cs {
+      margin-top: 24px; display: flex; align-items: center; justify-content: center;
+      gap: 5px; font-size: 0.85rem; color: #94a3b8;
+    }
+    .badge-cs {
+      display: inline-flex; align-items: center; justify-content: center;
+      height: 20px; width: 20px; border-radius: 50%;
+      background-color: #6366f1; color: white; font-weight: bold; font-size: 10px;
+    }
+    .btn-admin-small {
+      background: none; border: none; color: #cbd5e1; font-size: 0.7rem; cursor: pointer; width: auto; padding: 0; text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -106,9 +92,10 @@
 
   <div id="modalValidacion" class="modal activa">
     <div class="modal-content" style="text-align: center;">
-      <img src="https://i.ibb.co/q3d6Ktzm/logo-centro-asturiano2.png" style="width:70px;">
-      <h2 style="color:var(--azul-primario)">¡Hola! 👋 ¡Pase, Estimado Socio! El quincho te recibe con el olor a leña y las ganas de armar esta agenda. ¡A planificar y a disfrutar</h2>
-      <div class="form-group" style="text-align: left;">
+      <img src="https://i.ibb.co/q3d6Ktzm/logo-centro-asturiano2.png" style="width:70px; margin-bottom: 10px;">
+      <h2 style="color:var(--azul-primario); font-size: 1.2rem; line-height: 1.4;">¡Hola! 👋 ¡Pase, Estimado Socio! El quincho te recibe con el olor a leña y las ganas de armar esta agenda. ¡A planificar y a disfrutar!</h2>
+      
+      <div class="form-group" style="text-align: left; margin-top: 20px;">
         <label>N° de Socio</label>
         <input type="number" id="numSocio" placeholder="Ej: 12345">
       </div>
@@ -117,19 +104,31 @@
         <input type="text" id="fechaNac" placeholder="DD/MM/AAAA" oninput="mascaraFecha(this)">
       </div>
       <button id="btnValidar" onclick="validarSocio()">🔥 Ingresar 🪵</button>
-              <footer class="footer-cs">
+
+      <footer class="footer-cs">
         <span>Powered by</span>
         <span class="badge-cs">CS</span>
-    </footer>
+        <span style="margin: 0 5px;">|</span>
+        <button class="btn-admin-small" onclick="accesoAdmin()">⚙️ Admin</button>
+      </footer>
     </div>
-  
   </div>
-  
+
+  <div id="adminPanel" class="modal">
+    <div class="modal-content">
+      <h2 style="text-align:center; color:var(--rojo);">🔐 Panel de Administración</h2>
+      <div class="form-group">
+        <label>Bloquear Día (DD/MM/AAAA)</label>
+        <input type="text" id="fechaBloqueo" placeholder="DD/MM/AAAA" oninput="mascaraFecha(this)">
+      </div>
+      <button onclick="ejecutarBloqueo()" style="background:var(--rojo)">🚫 Bloquear Fecha Seleccionada</button>
+      <button class="btn-volver" onclick="cerrarModal('adminPanel')">Cerrar Panel</button>
+    </div>
+  </div>
   
   <div class="container">
     <div id="app" class="card" style="display:none;">
       <button class="btn-volver" onclick="location.reload()">⬅️ Salir / Volver</button>
-
       
       <h2 id="nombreSocioDisplay"></h2>
 
@@ -169,7 +168,7 @@
         </div>
       </div>
 
-      <h3 style="font-size: 1rem; color: var(--azul-primario); margin-top: 10px;">👥 Invitados (Precios por día):</h3>
+      <h3 style="font-size: 1rem; color: var(--azul-primario); margin-top: 10px;">👥 Invitados (Precios según fecha):</h3>
       <div class="grid-invitados">
         <div class="form-group"><label id="lbl_may">Mayores (18 a 65)</label><input type="number" id="may" value="0" min="0" oninput="calcularTotal()"></div>
         <div class="form-group"><label id="lbl_juv">Juveniles (13 a 17)</label><input type="number" id="juv" value="0" min="0" oninput="calcularTotal()"></div>
@@ -182,8 +181,11 @@
         <label style="display:flex; align-items:center; gap:10px; cursor:pointer; margin-bottom:10px;">
           <input type="checkbox" id="inflable" onchange="alertaInflable(this); calcularTotal();"> 🎈 Trae Inflable (+$20.000)
         </label>
-        <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+        <label style="display:flex; align-items:center; gap:10px; cursor:pointer; margin-bottom:10px;">
           <input type="checkbox" id="cumple" onchange="alertaCumple(this); calcularTotal();"> 🎉 Socio Cumpleañero (Bonif. 10 pers.)
+        </label>
+        <label style="display:flex; align-items:center; gap:10px; cursor:pointer; color: var(--azul-primario); font-weight: bold;">
+          <input type="checkbox" id="todosSocios" onchange="calcularTotal();"> 👥 Todos Socios (Invitados sin cargo)
         </label>
       </div>
 
@@ -204,7 +206,7 @@
       <div style="background:#f1f5f9; padding:15px; border-radius:12px; font-size:0.85rem; margin-top:15px; border-left: 4px solid var(--azul-primario);">
         <p><strong>🏦 Datos Bancarios:</strong></p>
         <p>CBU: 0070004720000001084140 <button class="btn-copy" onclick="copiar('0070004720000001084140')">📋 Copiar</button></p>
-        <p>Alias: asturianobaires <button class="btn-copy" onclick="copiar('CENTRO.ASTURIANO.BA')">📋 Copiar</button></p>
+        <p>Alias: CENTRO.ASTURIANO.BA <button class="btn-copy" onclick="copiar('CENTRO.ASTURIANO.BA')">📋 Copiar</button></p>
         <hr>
         <p style="color:var(--rojo); font-weight:bold;">⚠️ Nota Importante:</p>
         <p>Si desea abonar por otro medio de pago (Efectivo/Débito), deberá realizarlo por **Ventanilla** de administración hasta un día antes del evento.</p>
@@ -216,41 +218,25 @@
       </div>
     </div>
   </div>
-  <footer class="footer-cs">
-        <span>Powered by</span>
-        <span class="badge-cs">CS</span>
-    </footer>
 
 <script>
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx41-QO8j-m4a8uawlxYXbx5EFco8no01yuo1d4GJc35JBlb2fsGN9aPyKlsUGG0wcdDw/exec';
+  // REEMPLAZAR CON TU URL REAL
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyDeA08kHyeJ5nhLrXVlTBJoY_dgpf762OGBUfWTQf4j_n1oxzgzBO6KzIcQ-gYLPQ7vQ/exec';
 
-  // --- PRECIOS ---
-  // Martes, Miercoles, Jueves
   const PRECIOS_SEMANA = { may: 6700, juv: 5400, jub: 4200, men: 3800, inf: 0, inflable: 20000, seguridad: 20000 };
-  // Viernes, Sabado, Domingo y Feriados
   const PRECIOS_FINDE  = { may: 8300, juv: 6000, jub: 5300, men: 4300, inf: 0, inflable: 20000, seguridad: 20000 };
   
-  let TARIFAS_ACTUALES = PRECIOS_FINDE; // Arranca asumiendo el precio más alto
+  let TARIFAS_ACTUALES = PRECIOS_FINDE;
   let socioNombre = "";
   let descuentoAplicado = 0;
   let seguridadActiva = false;
 
-function mascaraFecha(i) {
-  // Elimina cualquier caracter que no sea número
-  let v = i.value.replace(/\D/g, '');
-  
-  // Limita a 8 dígitos (DDMMYYYY)
-  v = v.substring(0, 8);
-
-  // Aplica el formato DD/MM/YYYY
-  if (v.length > 2 && v.length <= 4) {
-    v = v.substring(0, 2) + '/' + v.substring(2);
-  } else if (v.length > 4) {
-    v = v.substring(0, 2) + '/' + v.substring(2, 4) + '/' + v.substring(4);
+  function mascaraFecha(i) {
+    let v = i.value.replace(/\D/g, '').substring(0, 8);
+    if (v.length > 2 && v.length <= 4) v = v.substring(0, 2) + '/' + v.substring(2);
+    else if (v.length > 4) v = v.substring(0, 2) + '/' + v.substring(2, 4) + '/' + v.substring(4);
+    i.value = v;
   }
-
-  i.value = v;
-}
 
   function mascaraHora(i) {
     let v = i.value.replace(/\D/g,'');
@@ -262,33 +248,45 @@ function mascaraFecha(i) {
     navigator.clipboard.writeText(texto).then(() => { alert("✅ Copiado: " + texto); });
   }
 
+  function accesoAdmin() {
+    const pass = prompt("Ingrese la clave de administrador:");
+    if (pass === "adm1081") document.getElementById('adminPanel').classList.add('activa');
+    else if (pass) alert("❌ Clave incorrecta");
+  }
+
+  function ejecutarBloqueo() {
+    const fecha = document.getElementById('fechaBloqueo').value;
+    if (fecha.length < 10) return alert("Fecha inválida");
+    if (confirm(`¿Bloquear el día ${fecha}?`)) {
+      fetch(`${APPS_SCRIPT_URL}?action=bloquearFecha&fecha=${fecha}`)
+        .then(r => r.json()).then(res => {
+          alert("✅ Fecha bloqueada correctamente.");
+          cerrarModal('adminPanel');
+        });
+    }
+  }
+
   function validarSocio() {
     const socio = document.getElementById('numSocio').value;
     const fechaRaw = document.getElementById('fechaNac').value;
-    const btn = document.getElementById('btnValidar');
-
-    if (!socio || !fechaRaw) { alert("Por favor completa ambos campos"); return; }
+    if (!socio || fechaRaw.length < 10) return alert("Por favor completa ambos campos");
 
     const partes = fechaRaw.split('/');
-    if (partes.length === 3) {
-      const fechaLimpia = `${partes[0]}/${partes[1]}/${partes[2]}`;
-      btn.innerText = "⏳ Verificando...";
-      btn.disabled = true;
+    const fechaLimpia = `${parseInt(partes[0], 10)}/${partes[1]}/${partes[2]}`;
 
-      fetch(`${APPS_SCRIPT_URL}?action=validarSocio&numSocio=${socio}&fechaNac=${fechaLimpia}`)
-        .then(r => r.json())
-        .then(res => {
-          if (res.exito) {
-            socioNombre = res.nombre;
-            document.getElementById('nombreSocioDisplay').innerText = "Socio/a: " + socioNombre;
-            document.getElementById('modalValidacion').classList.remove('activa');
-            document.getElementById('app').style.display = 'block';
-            calcularTotal(); // Inicializar UI
-          } else { alert("❌ " + res.mensaje); }
-        })
-        .catch(e => alert("Error de conexión"))
-        .finally(() => { btn.innerText = "🚀 Ingresar"; btn.disabled = false; });
-    } else { alert("Formato de fecha incorrecto"); }
+    const btn = document.getElementById('btnValidar');
+    btn.innerText = "⏳ Verificando..."; btn.disabled = true;
+
+    fetch(`${APPS_SCRIPT_URL}?action=validarSocio&numSocio=${socio}&fechaNac=${fechaLimpia}`)
+      .then(r => r.json()).then(res => {
+        if (res.exito) {
+          socioNombre = res.nombre;
+          document.getElementById('nombreSocioDisplay').innerText = "Socio/a: " + socioNombre;
+          document.getElementById('modalValidacion').classList.remove('activa');
+          document.getElementById('app').style.display = 'block';
+          calcularTotal();
+        } else alert("❌ " + res.mensaje);
+      }).finally(() => { btn.innerText = "🔥 Ingresar 🪵"; btn.disabled = false; });
   }
 
   function actualizarLabelsPrecios(tarifas) {
@@ -301,48 +299,23 @@ function mascaraFecha(i) {
   function calcularTotal() {
     const fechaInput = document.getElementById('fechaEvento').value;
     const esFeriadoCheck = document.getElementById('esFeriado').checked;
+    const esTodosSocios = document.getElementById('todosSocios').checked;
     const badge = document.getElementById('badgeTarifa');
 
-    // LÓGICA DE DETECCIÓN DE DÍA MEJORADA
-    let esFinde = true; // Por defecto asumimos finde (precio base)
-    let textoBadge = "Esperando fecha...";
-    let claseBadge = "tarifa-finde";
-
-    if (fechaInput && fechaInput.length === 10) {
+    let esFinde = true;
+    if (fechaInput.length === 10) {
       const [dia, mes, anio] = fechaInput.split('/').map(Number);
-      // Usamos hora 12:00 para evitar problemas de zona horaria
-      const fechaObj = new Date(anio, mes - 1, dia, 12, 0, 0);
-      const diaSemana = fechaObj.getDay(); // 0=Dom, 1=Lun, 2=Mar, 3=Mie, 4=Jue, 5=Vie, 6=Sab
-      
-      // Lógica estricta: Vie(5), Sab(6), Dom(0) O Feriado => Finde
-      if (diaSemana === 0 || diaSemana === 5 || diaSemana === 6 || esFeriadoCheck) {
-        esFinde = true;
-        textoBadge = "🟢 Tarifa: FIN DE SEMANA / FERIADO";
-        claseBadge = "tarifa-finde";
-      } else {
-        esFinde = false;
-        textoBadge = "🔵 Tarifa: SEMANA (Mar-Jue)";
-        claseBadge = "tarifa-semana";
-      }
+      const diaSemana = new Date(anio, mes - 1, dia, 12).getDay();
+      esFinde = (diaSemana === 0 || diaSemana === 5 || diaSemana === 6 || esFeriadoCheck);
       badge.style.display = "inline-block";
-    } else {
-        // Si la fecha está incompleta, ocultar badge o mostrar default
-        badge.style.display = "none";
+      badge.innerText = esFinde ? "🟢 Tarifa: FIN DE SEMANA / FERIADO" : "🔵 Tarifa: SEMANA (Mar-Jue)";
+      badge.className = esFinde ? "tarifa-finde" : "tarifa-semana";
     }
 
-    // Asignar tarifas según resultado
     TARIFAS_ACTUALES = esFinde ? PRECIOS_FINDE : PRECIOS_SEMANA;
-
-    // Actualizar Textos y Colores
     actualizarLabelsPrecios(TARIFAS_ACTUALES);
-    badge.innerText = textoBadge;
-    badge.className = ""; // Limpiar clases
-    badge.classList.add(claseBadge);
 
-
-    // --- CÁLCULOS MATEMÁTICOS ---
-    const hFin = document.getElementById('horaFin').value;
-    let counts = {
+    let c = {
       may: parseInt(document.getElementById('may').value) || 0,
       juv: parseInt(document.getElementById('juv').value) || 0,
       jub: parseInt(document.getElementById('jub').value) || 0,
@@ -350,45 +323,34 @@ function mascaraFecha(i) {
       inf: parseInt(document.getElementById('inf').value) || 0
     };
     
-    const totalInv = Object.values(counts).reduce((a, b) => a + b, 0);
+    const totalInv = Object.values(c).reduce((a, b) => a + b, 0);
     document.getElementById('totalInvitados').value = totalInv;
 
-    let subtotalInvitados = 
-        (counts.may * TARIFAS_ACTUALES.may) + 
-        (counts.juv * TARIFAS_ACTUALES.juv) + 
-        (counts.jub * TARIFAS_ACTUALES.jub) + 
-        (counts.men * TARIFAS_ACTUALES.men);
-    
+    let subtotal = 0;
     descuentoAplicado = 0;
-    if (document.getElementById('cumple').checked) {
-      let cupo = 10;
-      const orden = ['may', 'juv', 'jub', 'men'];
-      orden.forEach(tipo => {
-        if (cupo > 0 && counts[tipo] > 0) {
-          let descontar = Math.min(counts[tipo], cupo);
-          descuentoAplicado += (descontar * TARIFAS_ACTUALES[tipo]);
-          cupo -= descontar;
-        }
-      });
+
+    if (!esTodosSocios) {
+      subtotal = (c.may * TARIFAS_ACTUALES.may) + (c.juv * TARIFAS_ACTUALES.juv) + (c.jub * TARIFAS_ACTUALES.jub) + (c.men * TARIFAS_ACTUALES.men);
+      if (document.getElementById('cumple').checked) {
+        let cupo = 10;
+        ['may', 'juv', 'jub', 'men'].forEach(t => {
+          let d = Math.min(c[t], cupo);
+          descuentoAplicado += (d * TARIFAS_ACTUALES[t]);
+          cupo -= d;
+        });
+      }
     }
 
-    let total = subtotalInvitados - descuentoAplicado;
-
+    let total = subtotal - descuentoAplicado;
+    const hFin = document.getElementById('horaFin').value;
     seguridadActiva = false;
     if (hFin.includes(':')) {
       let [hh, mm] = hFin.split(':').map(Number);
-      let minTotales = (hh * 60) + mm;
-      // Lógica seguridad: Si es entre 00:10 (10 min) y 05:00 (300 min)
-      if (minTotales >= 10 && minTotales <= 300) {
+      if ((hh * 60 + mm) >= 10 && (hh * 60 + mm) <= 300) {
         total += TARIFAS_ACTUALES.seguridad;
         seguridadActiva = true;
-        if (!window.seguridadAlerta) {
-          alert("👮 SEGURIDAD:\nReunión después de las 00:00hs suma costo de seguridad ($20.000).");
-          window.seguridadAlerta = true;
-        }
-      } else { window.seguridadAlerta = false; }
+      }
     }
-
     if (document.getElementById('inflable').checked) total += TARIFAS_ACTUALES.inflable;
 
     document.getElementById('montoVisual').innerText = total.toLocaleString('es-AR');
@@ -396,73 +358,43 @@ function mascaraFecha(i) {
   }
 
   function alertaInflable(cb) {
-    if(cb.checked) alert("🎈 AVISO INFLABLE:\n\nEn los casos que se desea traer inflable se tendria que abonar locacion $20.000, hasta 1 dia previo al evento, ART y/o seguro de accidentes personales con cláusula de no repetición a nombre del CENTRO ASTURIANO DE BENOS AIRES Cuit: 30-54586286-3");
+    if(cb.checked) alert("🎈 AVISO INFLABLE:\n\nEn los casos que se desea traer inflable se tendria que abonar locacion $20.000, hasta 1 dia previo al evento, ART y/o seguro de accidentes personales con cláusula de no repetición a nombre del CENTRO ASTURIANO DE BUENOS AIRES Cuit: 30-54586286-3");
   }
   function alertaCumple(cb) {
-    if(cb.checked) alert("🎉 AVISO CUMPLEAÑERO:\n\nbeneficio unico para el socio cumpleañero para ser uso por unica vez desde la fecha de nacimiento hasta 30 dias corridos.");
+    if(cb.checked) alert("🎉 AVISO CUMPLEAÑERO:\n\nBeneficio único para el socio cumpleañero para ser uso por única vez desde la fecha de nacimiento hasta 30 días corridos.");
   }
 
+  function abrirConfirmacion() {
+    const fecha = document.getElementById('fechaEvento').value;
+    const totalInv = document.getElementById('totalInvitados').value;
+    const lugar = document.getElementById('tipoQuincho').value;
+    
+    if (fecha.length < 10 || !lugar) return alert("⚠️ Faltan datos.");
 
-  // ... resto de tus variables ...
+    const [d, m, a] = fecha.split('/').map(Number);
+    const diff = Math.floor((new Date(a, m-1, d) - new Date().setHours(0,0,0,0)) / 86400000);
+    if (diff < 0 || diff > 10) return alert("🚫 Máximo 10 días de anticipación.");
 
-function abrirConfirmacion() {
-  const fechaInput = document.getElementById('fechaEvento').value;
-  const hIni = document.getElementById('horaInicio').value;
-  const hFin = document.getElementById('horaFin').value;
-  const lugar = document.getElementById('tipoQuincho').value;
-  
-  // 1. OBTENER EL TOTAL DE INVITADOS (Importante para la suma en el servidor)
-  const totalInv = parseInt(document.getElementById('totalInvitados').value) || 0;
+    const btn = document.getElementById('btnConfirmar');
+    btn.innerText = "🔍 Verificando..."; btn.disabled = true;
 
-  if (!fechaInput || fechaInput.length < 10) { alert("⚠️ Fecha incompleta"); return; }
-  if (!hIni || !hFin) { alert("⚠️ Faltan los horarios"); return; }
-  if (!lugar) { alert("⚠️ Seleccione el lugar"); return; }
+    fetch(`${APPS_SCRIPT_URL}?action=verificarDisponibilidad&fecha=${fecha}&lugar=${lugar}&invitados=${totalInv}&inicio=${document.getElementById('horaInicio').value}`)
+      .then(r => r.json()).then(res => {
+        if (res.disponible === true) {
+          mostrarResumenFinal(); 
+        } else {
+          alert(res.mensaje);
+        }
+      }).finally(() => { btn.innerText = "📝 Revisar Detalle"; btn.disabled = false; });
+  }
 
-  const [dia, mes, anio] = fechaInput.split('/').map(Number);
-  const fechaElegida = new Date(anio, mes - 1, dia);
-  const hoy = new Date(); hoy.setHours(0,0,0,0);
-  const diffDias = Math.floor((fechaElegida - hoy) / (1000 * 60 * 60 * 24));
-
-  if (diffDias < 0) { alert("🚫 Fecha pasada."); return; }
-  if (diffDias > 10) { alert("🚫 Máximo 10 días de anticipación."); return; }
-
-  const btn = document.getElementById('btnConfirmar');
-  const textoOriginal = btn.innerText;
-  btn.innerText = "🔍 Verificando disponibilidad...";
-  btn.disabled = true;
-
-  // 2. CAMBIO AQUÍ: Agregamos &invitados=${totalInv} al final de la URL
-  const urlCheck = `${APPS_SCRIPT_URL}?action=verificarDisponibilidad&fecha=${encodeURIComponent(fechaInput)}&lugar=${encodeURIComponent(lugar)}&inicio=${encodeURIComponent(hIni)}&fin=${encodeURIComponent(hFin)}&invitados=${totalInv}`;
-
-  fetch(urlCheck)
-    .then(r => r.json())
-    .then(res => {
-      if (res.disponible) {
-        mostrarResumenFinal(); 
-      } else {
-        // Ahora el mensaje vendrá del servidor detallando cuántos cupos quedan
-        alert("⛔ ATENCIÓN:\n\n" + res.mensaje);
-      }
-    })
-    .catch(e => {
-      console.error(e);
-      alert("⚠️ Error de conexión al verificar disponibilidad.");
-    })
-    .finally(() => {
-      btn.innerText = textoOriginal;
-      btn.disabled = false;
-    });
-}
-
-  // He separado la lógica visual en esta nueva función para mantener el orden
   function mostrarResumenFinal() {
     const segVal = seguridadActiva ? TARIFAS_ACTUALES.seguridad : 0;
     const infVal = document.getElementById('inflable').checked ? TARIFAS_ACTUALES.inflable : 0;
-    const fechaInput = document.getElementById('fechaEvento').value;
-
+    
     let html = `
       <div class="item-detalle"><span>Socio:</span> <span>${socioNombre}</span></div>
-      <div class="item-detalle"><span>📅 Fecha:</span> <span>${fechaInput}</span></div>
+      <div class="item-detalle"><span>📅 Fecha:</span> <span>${document.getElementById('fechaEvento').value}</span></div>
       <div class="item-detalle"><span>📍 Lugar:</span> <span style="text-transform:capitalize">${document.getElementById('tipoQuincho').value}</span></div>
       <div class="item-detalle"><span>🕒 Horario:</span> <span>${document.getElementById('horaInicio').value} a ${document.getElementById('horaFin').value}</span></div>
       <div class="item-detalle"><span>👥 Invitados:</span> <span>${document.getElementById('totalInvitados').value}</span></div>
@@ -473,6 +405,9 @@ function abrirConfirmacion() {
     if(descuentoAplicado > 0) {
       html += `<div class="item-detalle bonus"><span>🎁 Bonificación 10p:</span> <span>- $${descuentoAplicado.toLocaleString('es-AR')}</span></div>`;
     }
+    if(document.getElementById('todosSocios').checked) {
+      html += `<div class="item-detalle bonus"><span>💎 Promo:</span> <span>TODOS SOCIOS (Sin cargo)</span></div>`;
+    }
 
     html += `<div class="total-box"><b>TOTAL FINAL: ARS $${document.getElementById('montoVisual').innerText}</b></div>`;
     document.getElementById('desgloseFinal').innerHTML = html;
@@ -482,29 +417,17 @@ function abrirConfirmacion() {
   function enviarDatosFinales() {
     const btn = document.getElementById('btnEnviar');
     btn.innerText = "⏳ Guardando..."; btn.disabled = true;
-
-    const numSocio = document.getElementById('numSocio').value;
-    const tipo = document.getElementById('tipoQuincho').value;
-    const fecha = document.getElementById('fechaEvento').value;
-    const hIni = document.getElementById('horaInicio').value;
-    const hFin = document.getElementById('horaFin').value;
-    const invitados = document.getElementById('totalInvitados').value;
-    const totalStr = document.getElementById('montoVisual').innerText;
-    const detalle = `May: ${document.getElementById('may').value}, Juv: ${document.getElementById('juv').value}, Jub: ${document.getElementById('jub').value}, Men: ${document.getElementById('men').value}`;
-
-    const urlFinal = `${APPS_SCRIPT_URL}?action=guardarAgenda&numSocio=${encodeURIComponent(numSocio)}&socio=${encodeURIComponent(socioNombre)}&tipo=${encodeURIComponent(tipo)}&fechaEvento=${encodeURIComponent(fecha)}&horaInicio=${encodeURIComponent(hIni)}&horaFin=${encodeURIComponent(hFin)}&totalInvitados=${encodeURIComponent(invitados)}&total=${encodeURIComponent(totalStr)}&listaInvitados=${encodeURIComponent(detalle)}`;
-
-    fetch(urlFinal, { method: 'GET' })
-      .then(r => r.json())
-      .then(res => {
+    
+    const params = `numSocio=${document.getElementById('numSocio').value}&socio=${socioNombre}&tipo=${document.getElementById('tipoQuincho').value}&fechaEvento=${document.getElementById('fechaEvento').value}&horaInicio=${document.getElementById('horaInicio').value}&horaFin=${document.getElementById('horaFin').value}&totalInvitados=${document.getElementById('totalInvitados').value}&total=${document.getElementById('montoVisual').innerText}&listaInvitados=May:${document.getElementById('may').value}, Juv:${document.getElementById('juv').value}, Jub:${document.getElementById('jub').value}, Men:${document.getElementById('men').value}`;
+    
+    fetch(`${APPS_SCRIPT_URL}?action=guardarAgenda&${params}`)
+      .then(r => r.json()).then(res => {
         if (res.exito) {
-          alert("✅ ¡Agenda guardada!");
-          window.open(`https://wa.me/5491151585858?text=Hola! Envío comprobante de reserva Quincho de ${socioNombre}`, '_blank');
+          alert("✅ ¡Agenda guardada exitosamente!");
+          window.open(`https://wa.me/5491151585858?text=Hola! Soy ${socioNombre}, acabo de agendar el quincho para el ${document.getElementById('fechaEvento').value}.`, '_blank');
           location.reload();
-        } else { alert("❌ Error: " + res.mensaje); }
-      })
-      .catch(e => alert("⚠️ Error al conectar."))
-      .finally(() => { btn.innerText = "💾 Confirmar y Guardar"; btn.disabled = false; });
+        } else alert("❌ Error al guardar.");
+      });
   }
 
   function cerrarModal(id) { document.getElementById(id).classList.remove('activa'); }
