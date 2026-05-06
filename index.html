@@ -221,7 +221,7 @@
 
 <script>
   // REEMPLAZAR CON TU URL REAL
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyIf8ixVScFIXQVt-7Ol4Ypql2vwcCU00qtkA49RzZ6aklnf-fQXgKPIFjjXfFajNApwg/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztGFVNgAtpmny7hpn06RE3HSz-Wr5ypJXVcG2EB3BQtpxZMmnuDSw8KkHSQXaSXqG5jA/exec';
 
   const PRECIOS_SEMANA = { may: 7400, juv: 6000, jub: 4600, men: 4200, inf: 0, inflable: 20000, seguridad: 20000 };
   const PRECIOS_FINDE  = { may: 9100, juv: 7000, jub: 5900, men: 4700, inf: 0, inflable: 20000, seguridad: 20000 };
@@ -268,17 +268,16 @@
 
   function validarSocio() {
     const socio = document.getElementById('numSocio').value;
-    const fechaRaw = document.getElementById('fechaNac').value; // Ejemplo: "05/05/1990"
+    const fechaRaw = document.getElementById('fechaNac').value; // Ejemplo: "07/04/1947"
     if (!socio || fechaRaw.length < 10) return alert("Por favor completa ambos campos");
 
-    // --- CORRECCIÓN AQUÍ: No usamos parseInt para no perder el cero ---
-    const fechaEnviada = fechaRaw.replace(/\//g, ''); // Queda "05051990"
-    // -----------------------------------------------------------------
+    // Quitamos las barras para enviar "07041947"
+    const fechaLimpia = fechaRaw.replace(/\D/g, ''); 
 
     const btn = document.getElementById('btnValidar');
     btn.innerText = "⏳ Verificando..."; btn.disabled = true;
 
-    fetch(`${APPS_SCRIPT_URL}?action=validarSocio&numSocio=${socio}&fechaNac=${fechaEnviada}`)
+    fetch(`${APPS_SCRIPT_URL}?action=validarSocio&numSocio=${socio}&fechaNac=${fechaLimpia}`)
       .then(r => r.json()).then(res => {
         if (res.exito) {
           socioNombre = res.nombre;
