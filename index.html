@@ -268,16 +268,17 @@
 
   function validarSocio() {
     const socio = document.getElementById('numSocio').value;
-    const fechaRaw = document.getElementById('fechaNac').value;
+    const fechaRaw = document.getElementById('fechaNac').value; // Ejemplo: "05/05/1990"
     if (!socio || fechaRaw.length < 10) return alert("Por favor completa ambos campos");
 
-    const partes = fechaRaw.split('/');
-    const fechaLimpia = `${parseInt(partes[0], 10)}/${partes[1]}/${partes[2]}`;
+    // --- CORRECCIÓN AQUÍ: No usamos parseInt para no perder el cero ---
+    const fechaEnviada = fechaRaw.replace(/\//g, ''); // Queda "05051990"
+    // -----------------------------------------------------------------
 
     const btn = document.getElementById('btnValidar');
     btn.innerText = "⏳ Verificando..."; btn.disabled = true;
 
-    fetch(`${APPS_SCRIPT_URL}?action=validarSocio&numSocio=${socio}&fechaNac=${fechaLimpia}`)
+    fetch(`${APPS_SCRIPT_URL}?action=validarSocio&numSocio=${socio}&fechaNac=${fechaEnviada}`)
       .then(r => r.json()).then(res => {
         if (res.exito) {
           socioNombre = res.nombre;
@@ -287,7 +288,7 @@
           calcularTotal();
         } else alert("❌ " + res.mensaje);
       }).finally(() => { btn.innerText = "🔥 Ingresar 🪵"; btn.disabled = false; });
-  }
+}
 
   function actualizarLabelsPrecios(tarifas) {
     document.getElementById('lbl_may').innerHTML = `Mayores (18 a 65) <b>($${tarifas.may.toLocaleString('es-AR')})</b>`;
